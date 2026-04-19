@@ -1,5 +1,12 @@
 # Initial Setup Guide
 
+## Step 0: Prerequisites
+
+- Node.js 24+ (the project declares `engines.node: ">=24"`; CI also runs Node 24)
+- A Vercel account for Postgres + Blob storage (see [`VERCEL_POSTGRES_SETUP.md`](VERCEL_POSTGRES_SETUP.md))
+
+Run `npm install` once to pull dependencies. This also sets up the Husky pre-commit hook automatically.
+
 ## Step 1: Configure Admin Credentials
 
 **IMPORTANT: Do this before deploying!**
@@ -79,12 +86,24 @@ Edit `public/flowers.html`:
 
 ## Step 5: Test Everything
 
+### Manual checks in the browser
+
 - [ ] Visit all 4 public pages
 - [ ] Test responsive design (resize browser)
 - [ ] Submit a test memory
 - [ ] Upload a test photo via admin
 - [ ] Edit/delete test content via admin
 - [ ] Check that photos appear on gallery page
+
+### Automated suite
+
+```bash
+npm run lint           # ESLint
+npm run typecheck      # tsc --noEmit (JS type check)
+npm run test:coverage  # Jest + coverage (80% threshold)
+```
+
+The Jest suite (127 tests) mocks Vercel Postgres / Blob / multer, so it runs offline without needing your real database credentials.
 
 ## Ready to Deploy?
 
@@ -99,7 +118,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying to free hosting
 
 ## Environment Variables for Deployment
 
-When deploying to hosting platforms (Render, Railway, etc.), you'll need to set these environment variables in their dashboard:
+This project is designed for Vercel (see [`DEPLOYMENT.md`](DEPLOYMENT.md)). Set these environment variables in the Vercel dashboard under **Settings → Environment Variables**:
 
 ```
 ADMIN_USERNAME=your_username

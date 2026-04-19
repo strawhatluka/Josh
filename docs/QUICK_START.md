@@ -1,5 +1,12 @@
 # Quick Start Guide
 
+## 0. Prerequisites
+
+- Node.js 24+ (`engines.node: ">=24"` in `package.json`)
+- A Vercel account (for Postgres + Blob storage)
+
+Run `npm install` once to pull dependencies and set up the Husky pre-commit hook.
+
 ## 1. Start the Server
 
 ```bash
@@ -38,12 +45,24 @@ Edit `public/flowers.html`:
 
 ## 3. Test Everything
 
+### Manual smoke test in the browser
+
 - Visit all 4 pages to ensure content looks good
 - Test on mobile (resize browser window)
 - Submit a test memory to verify the form works
 - Submit a test memory with a photo - test the crop feature
 - Upload a test photo via admin panel (gallery) - test gallery crop feature
 - Verify you can view and delete memories with photos in admin panel
+
+### Automated test suite
+
+```bash
+npm test               # run the Jest suite (127 tests, DB mocked)
+npm run test:coverage  # with coverage report (80% threshold enforced)
+npm run typecheck      # tsc --noEmit (JS type check via checkJs)
+```
+
+The automated suite uses mocked Vercel Postgres / Blob / multer — no database or network access required.
 
 ## 4. Before Deploying
 
@@ -86,7 +105,7 @@ Edit `public/css/global.css` - look for `:root` variables at the top
 
 1. Create new HTML file in `public/`
 2. Add link to navigation in all pages
-3. Add route in `src/server.js`
+3. Add route in `src/app.js` (the Express app factory — `src/server.js` is now just the thin bootstrap)
 
 **Moderate memories:**
 Use admin panel at http://localhost:3000/admin - "Memories" tab

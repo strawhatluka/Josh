@@ -45,6 +45,7 @@ The admin link is not visible on any public pages - you must navigate to it dire
 **Notes:**
 
 - Password is stored as plaintext in `.env` but automatically hashed with bcrypt by the app
+- bcrypt cost is env-gated: 12 rounds in production, 4 rounds under `NODE_ENV=test` (keeps the test suite fast without losing real bcrypt integration in prod)
 - `.env` file is in `.gitignore` so it won't be committed to Git
 - Generate a random session secret at: https://randomkeygen.com/
 - The app supports both `.env` and `.env.local` (tries `.env.local` first)

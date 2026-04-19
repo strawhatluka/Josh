@@ -8,8 +8,13 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Type Checking](#type-checking)
 - [Security](#security)
+- [CI/CD](#cicd)
 - [Deployment](#deployment)
+- [Versioning](#versioning)
+- [Available Scripts](#available-scripts)
 - [Documentation](#documentation)
 - [License](#license)
 
@@ -49,8 +54,8 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
   - Prevents XSS attacks
   - Configured via Helmet.js
 - **Authentication**:
-  - bcrypt password hashing (10 rounds)
-  - Session-based authentication
+  - bcrypt password hashing (12 rounds in production, 4 rounds under `NODE_ENV=test` for fast suites)
+  - Session-based authentication with typed session data (`isAdmin`, `username`)
   - PostgreSQL session store for serverless compatibility
   - Secure cookie configuration
 - **Input Validation**:
@@ -66,9 +71,12 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 ### Code Quality
 
 - **Pre-commit Hooks**: Automatic code formatting and linting via Husky
-- **ESLint**: JavaScript best practices enforcement
-- **Prettier**: Consistent code formatting across the project
+- **ESLint**: Flat config (v9) with JavaScript best practices enforcement and Jest-globals override for tests
+- **Prettier**: Consistent code formatting across JS, JSON, CSS, HTML, and Markdown
 - **Lint-staged**: Optimized pre-commit checks on staged files only
+- **TypeScript (typecheck only)**: `tsc --noEmit` with `allowJs`/`checkJs` validates the JS codebase without emitting output
+- **Jest + Supertest**: 127 tests across 12 suites, mocked database so tests run offline
+- **Coverage threshold**: 80% across branches / functions / lines / statements, enforced in CI
 
 ## Tech Stack
 
@@ -93,13 +101,16 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 
 ### Development Tools
 
-- ESLint, Prettier, Husky, Lint-staged
+- ESLint (flat config v9), Prettier, Husky, Lint-staged
+- TypeScript (typecheck only — `tsc --noEmit` against JS with `checkJs`)
+- Jest + Supertest (127 tests, mocked DB)
+- GitHub Actions CI/CD (`.github/workflows/ci.yml`, `release.yml`, `deploy.yml`)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
+- Node.js 24+ (`engines.node: ">=24"` in `package.json`; CI runs Node 24)
 - Vercel account (for Postgres and Blob storage)
 - Vercel CLI (`npm i -g vercel`)
 
@@ -194,23 +205,44 @@ Josh/
 │   └── admin.html              # Admin panel
 │
 ├── src/                        # Backend source code
+│   ├── app.js                  # Express app factory (createApp() — no side effects)
+│   ├── server.js               # Thin bootstrap (initializeDatabase + app.listen)
 │   ├── config/
-│   │   ├── admin.js            # Admin credentials
+│   │   ├── admin.js            # Admin credentials + bcrypt rounds (env-gated)
 │   │   └── rateLimits.js       # Rate limiting configuration
 │   ├── db/
-│   │   └── index.js            # Database connection
+│   │   ├── index.js            # Database connection (@vercel/postgres + pg.Pool)
+│   │   └── schema.sql          # Table definitions
 │   ├── middleware/
-│   │   └── auth.js             # Authentication middleware
+│   │   └── auth.js             # Authentication middleware (requireAuth)
 │   ├── routes/
 │   │   ├── admin.js            # Admin API endpoints
 │   │   ├── gallery.js          # Public gallery endpoints
 │   │   └── memories.js         # Memory submission endpoints
-│   ├── utils/
-│   │   ├── blob.js             # Vercel Blob utilities
-│   │   ├── gallery.js          # Gallery database operations
-│   │   ├── storage.js          # Memory database operations
-│   │   └── validator.js        # Input validation
-│   └── server.js               # Express server entry point
+│   ├── types/
+│   │   └── express-session.d.ts # Session data type augmentation
+│   └── utils/
+│       ├── blob.js             # Vercel Blob utilities
+│       ├── gallery.js          # Gallery database operations
+│       ├── storage.js          # Memory database operations
+│       └── validator.js        # Input validation
+│
+├── tests/                      # Jest + Supertest test suite
+│   ├── _mocks/                 # Shared mocks (Vercel Postgres/Blob, multer, pg, session store)
+│   ├── app.smoke.test.js       # Boot + smoke integration test
+│   ├── config/                 # Tests for src/config
+│   ├── db/                     # Tests for src/db
+│   ├── middleware/             # Tests for src/middleware
+│   ├── routes/                 # Tests for src/routes (supertest)
+│   ├── utils/                  # Tests for src/utils
+│   └── setup.js                # Test environment bootstrap
+│
+├── .github/                    # GitHub Actions workflows
+│   ├── workflows/
+│   │   ├── ci.yml              # Lint, typecheck, test + coverage
+│   │   ├── release.yml         # Tag v*.*.* → draft release from CHANGELOG
+│   │   └── deploy.yml          # Release published → Vercel deploy
+│   └── SECRETS.md              # Required repo secrets checklist
 │
 ├── docs/                       # Documentation
 │   ├── QUICK_START.md
@@ -220,7 +252,12 @@ Josh/
 │   ├── PRE_COMMIT_SETUP.md
 │   └── VERCEL_POSTGRES_SETUP.md
 │
-├── .husky/                     # Git hooks
+├── .husky/                     # Git hooks (pre-commit runs lint-staged)
+├── CHANGELOG.md                # Keep-a-Changelog — release notes source
+├── jest.config.js              # Jest config (80% coverage threshold)
+├── tsconfig.json               # TypeScript typecheck config (checkJs, noEmit)
+├── eslint.config.js            # ESLint flat config (v9)
+├── vercel.json                 # Vercel deployment config
 ├── LICENSE                     # MIT License
 └── README.md                   # This file
 ```
@@ -246,22 +283,69 @@ Josh/
 **Medium Priority**: None
 **Low Priority**: Consider 2FA for enterprise deployments
 
-For details, see [SECURITY_AUDIT.md](SECURITY_AUDIT.md)
+## Testing
+
+The project ships with a full Jest + Supertest suite (127 tests across 12 suites). Tests use mocked Vercel Postgres / Vercel Blob / multer / pg / session-store fakes, so the suite runs fully offline — no live database or network access required.
+
+```bash
+npm test              # run all tests
+npm run test:coverage # run tests + coverage report
+```
+
+### Coverage
+
+Coverage thresholds are enforced globally at 80% across branches, functions, lines, and statements (see `jest.config.js`). CI fails if any metric drops below the threshold.
+
+### Test organization
+
+```
+tests/
+├── _mocks/           # Shared mocks (vercelPostgres, vercelBlob, multer, pg, connectPgSimple)
+├── app.smoke.test.js # Boots the app and hits public routes via supertest
+├── config/           # Tests for src/config
+├── db/               # Tests for src/db
+├── middleware/       # Tests for src/middleware
+├── routes/           # Supertest integration tests for src/routes
+├── utils/            # Unit tests for src/utils
+└── setup.js          # Runs before every suite — sets NODE_ENV=test + test env defaults
+```
+
+## Type Checking
+
+The JS codebase is validated with `tsc --noEmit` using `allowJs: true, checkJs: true` in `tsconfig.json`. No `.ts` files are emitted — TypeScript is used purely as a type checker against the JavaScript source.
+
+```bash
+npm run typecheck
+```
+
+Type augmentation for Express session data lives at `src/types/express-session.d.ts`. When adding properties to `req.session`, update that file.
+
+## CI/CD
+
+Three GitHub Actions workflows under `.github/workflows/`:
+
+| Workflow      | Trigger                                     | What it does                                                                                                           |
+| ------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `ci.yml`      | Push/PR to `main` or `dev`                  | Parallel `quality` (format:check, lint, typecheck) + `test` (coverage, artifact upload) jobs on Node 24                |
+| `release.yml` | Push of a `v*.*.*` git tag                  | Extracts the matching section from `CHANGELOG.md` and creates a draft GitHub release via `softprops/action-gh-release` |
+| `deploy.yml`  | GitHub release published OR manual dispatch | Deploys to Vercel via `vercel pull` → `vercel build` → `vercel deploy --prebuilt --prod`                               |
+
+### Cutting a release
+
+1. Add the new version section to `CHANGELOG.md` under `## [x.y.z] - YYYY-MM-DD`.
+2. Commit + push to `main`.
+3. Tag the commit: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+4. `release.yml` creates a draft release on GitHub with the extracted notes.
+5. Review the draft in the GitHub UI and click **Publish**.
+6. Publishing fires `deploy.yml`, which deploys to Vercel.
+
+Required repo secrets for `deploy.yml`: `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `VERCEL_TOKEN`. See [`.github/SECRETS.md`](.github/SECRETS.md) for values and setup.
 
 ## Deployment
 
-### Vercel Deployment (Recommended)
+Deployment is driven by the CI/CD pipeline described above — publishing a GitHub release triggers an automated Vercel deploy. For initial Vercel project setup, environment variable configuration, and custom domain instructions, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-1. Push to GitHub
-2. Deploy to Vercel: `vercel --prod`
-3. Configure environment variables in Vercel dashboard
-4. Set up custom domain (optional)
-
-Full guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
-
-### Manual Deployment
-
-Can be deployed to any Node.js host with PostgreSQL and blob storage support.
+Manual deploys (e.g., for hotfixes outside the release flow) can be run with the **Deploy to Vercel** workflow's `workflow_dispatch` trigger from the GitHub Actions UI.
 
 ## Documentation
 
@@ -272,15 +356,26 @@ Can be deployed to any Node.js host with PostgreSQL and blob storage support.
 - [Pre-commit Hooks](docs/PRE_COMMIT_SETUP.md)
 - [Database Setup](docs/VERCEL_POSTGRES_SETUP.md)
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/). Release notes live in [`CHANGELOG.md`](CHANGELOG.md) using the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format. The `release.yml` workflow reads directly from that file — so every tagged release must have a matching `## [x.y.z]` section in the changelog.
+
 ## Available Scripts
 
 ```bash
 npm start              # Production server
 npm run dev            # Development server with auto-reload
-npm run format         # Format all files with Prettier
-npm run format:check   # Check formatting
+
+npm run format         # Format all files with Prettier (JS, JSON, CSS, HTML, MD)
+npm run format:check   # Check formatting without writing
+
 npm run lint           # Run ESLint
 npm run lint:fix       # ESLint with auto-fix
+
+npm run typecheck      # tsc --noEmit (JS type check via checkJs)
+
+npm test               # Run Jest test suite
+npm run test:coverage  # Run tests with coverage (fails below 80%)
 ```
 
 ## Contributing
