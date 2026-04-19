@@ -5,11 +5,13 @@
 **IMPORTANT: Do this before deploying!**
 
 1. Copy the environment template:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Open `.env` in your text editor and change these values:
+
    ```env
    ADMIN_USERNAME=your_chosen_username
    ADMIN_PASSWORD=YourSecurePassword123!
@@ -20,6 +22,7 @@
    - Use a "Fort Knox Password" or similar long random string
 
 **Security Notes:**
+
 - Don't use simple passwords
 - Never commit the `.env` file to Git (it's already in `.gitignore`)
 - The password is automatically hashed by the application
@@ -33,6 +36,7 @@ npm run dev
 The site will run at: http://localhost:3000
 
 You should see a warning if using default credentials:
+
 ```
 ⚠️  WARNING: Using default admin credentials!
    Create a .env file from .env.example and set secure credentials.
@@ -49,12 +53,14 @@ If you created the `.env` file correctly, you won't see this warning.
 ## Step 4: Add Your Content
 
 ### Landing Page
+
 1. Add his photo to `public/images/landing/photo.jpg`
 2. Edit `public/index.html`:
    - Replace `[Full Name]`
    - Add dates and obituary text
 
 ### Photo Gallery (via Admin Panel)
+
 1. Log into admin panel
 2. Go to "Photo Gallery" tab
 3. Select a photo file
@@ -64,7 +70,9 @@ If you created the `.env` file correctly, you won't see this warning.
 7. Gallery loads dynamically from PostgreSQL database
 
 ### Resources Page
+
 Edit `public/flowers.html`:
+
 - Add GoFundMe link (replace `[YOUR_GOFUNDME_LINK]`)
 - Add any context about his passing
 - Customize resource descriptions if needed
@@ -83,6 +91,7 @@ Edit `public/flowers.html`:
 See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying to free hosting.
 
 **Before deploying, make sure:**
+
 - [ ] `.env` file has secure credentials
 - [ ] Landing page has real content
 - [ ] You've tested all functionality locally
@@ -104,16 +113,19 @@ NODE_ENV=production
 ## Troubleshooting
 
 **Can't log into admin:**
+
 - Check your `.env` file exists and has correct values
 - Restart the server after changing `.env`
 - Try the default credentials (admin/changeme123) if `.env` isn't loading
 
 **Warning about default credentials:**
+
 - This means `.env` file wasn't found or didn't load
 - Make sure you copied `.env.example` to `.env`
 - Check that `.env` is in the root directory
 
 **Photos not appearing:**
+
 - Check admin panel uploaded them successfully (look for success message)
 - Verify photos were uploaded to Vercel Blob (check Vercel Storage dashboard)
 - Check database contains photo entries (check Vercel Storage → Postgres → Data)

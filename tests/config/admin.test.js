@@ -1,5 +1,11 @@
 const bcrypt = require('bcryptjs');
 
+// Neutralize dotenv so tests fully control process.env. Without this, the
+// source's dotenv.config() re-reads .env.local and re-injects real creds.
+jest.mock('dotenv', () => ({
+  config: jest.fn()
+}));
+
 describe('config/admin', () => {
   const ORIGINAL_ENV = { ...process.env };
 

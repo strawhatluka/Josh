@@ -17,4 +17,3 @@
   "include": ["src/**/*.js", "src/**/*.d.ts", "tests/**/*.js"],
   "exclude": ["node_modules", ".vercel", "coverage", "public", "data"]
 }
-

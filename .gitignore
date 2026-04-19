@@ -7,11 +7,8 @@ node_modules/
 
 # Trinity Method deployment files
 .claude/
-trinity/
-trinity-hooks/
-viewer/
 CLAUDE.md
-TRINITY.md
+
 
 # OS files
 .DS_Store
@@ -28,3 +25,6 @@ npm-debug.log*
 *.swo
 .vercel
 .env*.local
+
+# Test Coverage
+coverage/

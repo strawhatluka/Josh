@@ -80,6 +80,7 @@ loginForm.addEventListener('submit', async e => {
       showMessage(loginMessage, data.message || 'Login failed', 'error');
     }
   } catch (error) {
+    console.error('Login error:', error);
     showMessage(loginMessage, 'Login failed. Please try again.', 'error');
   }
 });
@@ -172,6 +173,7 @@ document.getElementById('cropConfirm').addEventListener('click', async () => {
           showMessage(uploadMessage, data.message || 'Upload failed', 'error');
         }
       } catch (error) {
+        console.error('Upload error:', error);
         showMessage(uploadMessage, 'Upload failed. Please try again.', 'error');
       }
     },
@@ -211,6 +213,7 @@ async function loadGallery() {
       galleryList.innerHTML = '<p class="message error">Failed to load gallery</p>';
     }
   } catch (error) {
+    console.error('Error loading gallery:', error);
     galleryList.innerHTML = '<p class="message error">Failed to load gallery</p>';
   }
 }
@@ -279,6 +282,7 @@ document.getElementById('editPhotoForm').addEventListener('submit', async e => {
       );
     }
   } catch (error) {
+    console.error('Error updating photo:', error);
     showMessage(
       document.getElementById('editPhotoMessage'),
       'Update failed. Please try again.',
@@ -307,6 +311,7 @@ async function deletePhoto(id) {
       alert(data.message || 'Delete failed');
     }
   } catch (error) {
+    console.error('Error deleting photo:', error);
     alert('Delete failed. Please try again.');
   }
 }
@@ -325,6 +330,7 @@ async function loadMemories() {
       memoriesAdminList.innerHTML = '<p class="message error">Failed to load memories</p>';
     }
   } catch (error) {
+    console.error('Error loading memories:', error);
     memoriesAdminList.innerHTML = '<p class="message error">Failed to load memories</p>';
   }
 }
@@ -407,6 +413,7 @@ document.getElementById('editMemoryForm').addEventListener('submit', async e => 
       showMessage(document.getElementById('editMessage'), data.message || 'Update failed', 'error');
     }
   } catch (error) {
+    console.error('Error updating memory:', error);
     showMessage(
       document.getElementById('editMessage'),
       'Update failed. Please try again.',
@@ -435,6 +442,7 @@ async function deleteMemory(id) {
       alert(data.message || 'Delete failed');
     }
   } catch (error) {
+    console.error('Error deleting memory:', error);
     alert('Delete failed. Please try again.');
   }
 }
@@ -453,6 +461,7 @@ async function checkAuthStatus() {
       showLogin();
     }
   } catch (error) {
+    console.error('Error checking auth status:', error);
     showLogin();
   }
 }
@@ -581,13 +590,13 @@ function handleDragOver(e) {
   return false;
 }
 
-function handleDragEnter(e) {
+function handleDragEnter(_e) {
   if (this !== draggedElement) {
     this.classList.add('drag-over');
   }
 }
 
-function handleDragLeave(e) {
+function handleDragLeave(_e) {
   this.classList.remove('drag-over');
 }
 
@@ -616,7 +625,7 @@ function handleDrop(e) {
   return false;
 }
 
-function handleDragEnd(e) {
+function handleDragEnd(_e) {
   this.classList.remove('dragging');
 
   const items = document.querySelectorAll('.gallery-admin-item');
@@ -624,6 +633,13 @@ function handleDragEnd(e) {
     item.classList.remove('drag-over');
   });
 }
+
+// Expose functions called from inline onclick= handlers in HTML.
+// Without these assignments, bundlers/linters can't see the usage.
+window.editPhoto = editPhoto;
+window.deletePhoto = deletePhoto;
+window.editMemory = editMemory;
+window.deleteMemory = deleteMemory;
 
 async function savePhotoOrder() {
   const items = [...galleryList.querySelectorAll('.gallery-admin-item')];

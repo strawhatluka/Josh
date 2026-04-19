@@ -6,9 +6,12 @@
  * duration of a single test run — enough for supertest flows to carry cookies
  * across requests without touching Postgres.
  */
+const { EventEmitter } = require('events');
+
 module.exports = function connectPgSimpleFactory(_session) {
-  class MemoryPgStore {
+  class MemoryPgStore extends EventEmitter {
     constructor(_opts) {
+      super();
       this.sessions = new Map();
     }
 

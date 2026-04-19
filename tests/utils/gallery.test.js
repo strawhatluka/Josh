@@ -34,9 +34,7 @@ describe('addPhoto', () => {
   it('inserts a photo at the end of the order', async () => {
     // First call: SELECT MAX(display_order). Second call: INSERT.
     pgMock.__setRows([{ max_order: 5 }]);
-    pgMock.__setRows([
-      { id: 10, filename: 'a.jpg', photo_url: 'u', caption: '', order: 6 }
-    ]);
+    pgMock.__setRows([{ id: 10, filename: 'a.jpg', photo_url: 'u', caption: '', order: 6 }]);
     const result = await addPhoto({ filename: 'a.jpg', photoUrl: 'u', caption: '' });
     expect(result.order).toBe(6);
   });
@@ -50,17 +48,15 @@ describe('addPhoto', () => {
 
   it('wraps DB errors with a generic message', async () => {
     pgMock.__setError(new Error('select failed'));
-    await expect(
-      addPhoto({ filename: 'a.jpg', photoUrl: 'u', caption: '' })
-    ).rejects.toThrow('Failed to add photo');
+    await expect(addPhoto({ filename: 'a.jpg', photoUrl: 'u', caption: '' })).rejects.toThrow(
+      'Failed to add photo'
+    );
   });
 });
 
 describe('updatePhoto', () => {
   it('updates caption and returns the photo', async () => {
-    pgMock.__setRows([
-      { id: 1, filename: 'a.jpg', photo_url: 'u', caption: 'new', order: 1 }
-    ]);
+    pgMock.__setRows([{ id: 1, filename: 'a.jpg', photo_url: 'u', caption: 'new', order: 1 }]);
     const result = await updatePhoto(1, { caption: 'new' });
     expect(result.caption).toBe('new');
   });
@@ -84,9 +80,7 @@ describe('updatePhoto', () => {
 
 describe('deletePhoto', () => {
   it('deletes and returns the removed photo', async () => {
-    pgMock.__setRows([
-      { id: 7, filename: 'a.jpg', photo_url: 'u', caption: 'c', order: 7 }
-    ]);
+    pgMock.__setRows([{ id: 7, filename: 'a.jpg', photo_url: 'u', caption: 'c', order: 7 }]);
     const result = await deletePhoto(7);
     expect(result.id).toBe(7);
   });

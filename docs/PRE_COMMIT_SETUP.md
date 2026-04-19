@@ -57,6 +57,7 @@ npx lint-staged
 ## Current Linting Warnings
 
 The linter currently shows warnings for:
+
 - Unused variables in catch blocks (can be prefixed with `_` to ignore)
 - Functions defined in HTML onclick attributes (editPhoto, deletePhoto, editMemory, deleteMemory)
 

@@ -23,9 +23,7 @@ describe('GET /api/gallery', () => {
   });
 
   it('returns photos on success', async () => {
-    pgMock.__setRows([
-      { id: 1, filename: 'a.jpg', photo_url: 'u1', caption: 'c1', order: 1 }
-    ]);
+    pgMock.__setRows([{ id: 1, filename: 'a.jpg', photo_url: 'u1', caption: 'c1', order: 1 }]);
     const res = await request(app).get('/api/gallery');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);

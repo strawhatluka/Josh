@@ -15,7 +15,7 @@ jest.mock('../../src/config/rateLimits', () => ({
 
 const pgMock = require('../_mocks/vercelPostgres');
 const blobMock = require('../_mocks/vercelBlob');
-const multerMock = require('multer');
+const multerMock = require('../_mocks/multer');
 const adminRouter = require('../../src/routes/admin');
 
 function buildApp() {
@@ -191,12 +191,8 @@ describe('Admin gallery endpoints (require auth)', () => {
   it('PUT /api/admin/gallery/:id — updates a caption', async () => {
     const app = buildApp();
     const agent = await loginAgent(app);
-    pgMock.__setRows([
-      { id: 1, filename: 'a.jpg', photo_url: 'u', caption: 'new', order: 1 }
-    ]);
-    const res = await agent
-      .put('/api/admin/gallery/1')
-      .send({ caption: 'new' });
+    pgMock.__setRows([{ id: 1, filename: 'a.jpg', photo_url: 'u', caption: 'new', order: 1 }]);
+    const res = await agent.put('/api/admin/gallery/1').send({ caption: 'new' });
     expect(res.status).toBe(200);
     expect(res.body.photo.caption).toBe('new');
   });
@@ -242,9 +238,12 @@ describe('Admin gallery endpoints (require auth)', () => {
     const agent = await loginAgent(app);
     pgMock.__setRows([]);
     pgMock.__setRows([]);
-    const res = await agent
-      .patch('/api/admin/gallery/reorder')
-      .send({ photoOrders: [{ id: 1, order: 2 }, { id: 2, order: 1 }] });
+    const res = await agent.patch('/api/admin/gallery/reorder').send({
+      photoOrders: [
+        { id: 1, order: 2 },
+        { id: 2, order: 1 }
+      ]
+    });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
   });
@@ -287,12 +286,8 @@ describe('Admin memories endpoints (require auth)', () => {
   it('PUT /api/admin/memories/:id — updates a memory', async () => {
     const app = buildApp();
     const agent = await loginAgent(app);
-    pgMock.__setRows([
-      { id: 1, from: 'Luka', message: 'edited', photo: null, timestamp: 't' }
-    ]);
-    const res = await agent
-      .put('/api/admin/memories/1')
-      .send({ from: 'Luka', message: 'edited' });
+    pgMock.__setRows([{ id: 1, from: 'Luka', message: 'edited', photo: null, timestamp: 't' }]);
+    const res = await agent.put('/api/admin/memories/1').send({ from: 'Luka', message: 'edited' });
     expect(res.status).toBe(200);
     expect(res.body.memory.message).toBe('edited');
   });
@@ -301,9 +296,7 @@ describe('Admin memories endpoints (require auth)', () => {
     const app = buildApp();
     const agent = await loginAgent(app);
     pgMock.__setRows([]);
-    const res = await agent
-      .put('/api/admin/memories/999')
-      .send({ from: 'x', message: 'y' });
+    const res = await agent.put('/api/admin/memories/999').send({ from: 'x', message: 'y' });
     expect(res.status).toBe(500);
   });
 
@@ -322,9 +315,7 @@ describe('Admin memories endpoints (require auth)', () => {
   it('DELETE /api/admin/memories/:id — works without a photo', async () => {
     const app = buildApp();
     const agent = await loginAgent(app);
-    pgMock.__setRows([
-      { id: 2, from: 'Luka', message: 'bye', photo: null, timestamp: 't' }
-    ]);
+    pgMock.__setRows([{ id: 2, from: 'Luka', message: 'bye', photo: null, timestamp: 't' }]);
     const res = await agent.delete('/api/admin/memories/2');
     expect(res.status).toBe(200);
   });

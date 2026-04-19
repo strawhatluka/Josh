@@ -12,7 +12,7 @@ try {
   } else {
     dotenv.config();
   }
-} catch (err) {
+} catch (_err) {
   // dotenv not installed or no .env file, use defaults
 }
 

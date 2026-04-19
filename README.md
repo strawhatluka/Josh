@@ -16,6 +16,7 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 ## Features
 
 ### Public Features
+
 - **Landing Page**: Beautiful hero image with full obituary and life celebration
 - **Photo Gallery**: Chronological photo timeline ("Through the Years") with captions
 - **Memory Wall**: Visitors can share memories and condolences with optional photo attachments
@@ -24,6 +25,7 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 - **Image Cropping**: Built-in cropper for visitors to crop photos before submission
 
 ### Admin Features
+
 - **Secure Authentication**: Session-based authentication with bcrypt password hashing
 - **Photo Gallery Management**:
   - Upload and crop photos with captions
@@ -37,6 +39,7 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 - **Rate Limiting**: Automated protection against spam and abuse
 
 ### Security Features
+
 - **Rate Limiting**:
   - Admin login: 5 attempts per 15 minutes per IP
   - Memory submission: 5 submissions per minute per IP
@@ -61,6 +64,7 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
   - Content-Security-Policy
 
 ### Code Quality
+
 - **Pre-commit Hooks**: Automatic code formatting and linting via Husky
 - **ESLint**: JavaScript best practices enforcement
 - **Prettier**: Consistent code formatting across the project
@@ -69,21 +73,26 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 ## Tech Stack
 
 ### Frontend
+
 - HTML5, CSS3 (Grid & Flexbox), Vanilla JavaScript
 - Cropper.js for image manipulation
 
 ### Backend
+
 - Node.js, Express.js
 - Multer (file uploads), Express Session, Helmet, Express Rate Limit
 
 ### Database & Storage
+
 - Vercel Postgres (Neon) - Serverless PostgreSQL database
 - Vercel Blob - Serverless blob storage for images
 
 ### Security & Authentication
+
 - bcryptjs, connect-pg-simple, Helmet, CORS
 
 ### Development Tools
+
 - ESLint, Prettier, Husky, Lint-staged
 
 ## Getting Started
@@ -97,25 +106,30 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd Josh
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
+
    This automatically sets up pre-commit hooks via Husky.
 
 3. **Set up environment variables**
 
    Copy `.env.example` to `.env`:
+
    ```bash
    cp .env.example .env
    ```
 
    Configure the following:
+
    ```env
    POSTGRES_URL="postgres://..."
    POSTGRES_URL_NON_POOLING="postgres://..."
@@ -128,6 +142,7 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
    ```
 
 4. **Link to Vercel project** (for local development)
+
    ```bash
    vercel link
    vercel env pull
@@ -143,11 +158,13 @@ A heartfelt memorial website built to honor and remember Joshua Alexander Downs 
 ### Running Locally
 
 **Development mode** (with auto-reload):
+
 ```bash
 npm run dev
 ```
 
 **Production mode**:
+
 ```bash
 npm start
 ```
@@ -215,6 +232,7 @@ Josh/
 **Overall Rating**: A- (Excellent)
 
 **Implemented Security Measures**:
+
 1. Rate limiting on admin login and public submissions
 2. Comprehensive Content Security Policy via Helmet.js
 3. Session-based authentication with bcrypt
@@ -279,12 +297,6 @@ MIT License - see [LICENSE](LICENSE) file.
 
 Built with love in memory of Joshua Alexander Downs.
 
-*"If the people we love are stolen from us, the way to have them live on is to never stop loving them."* - The Crow
+_"If the people we love are stolen from us, the way to have them live on is to never stop loving them."_ - The Crow
 
 ---
-
-**Version**: 1.0.0
-**Last Updated**: December 2025
-**Node.js**: v18+
-**Database**: Vercel Postgres (Neon)
-**Storage**: Vercel Blob

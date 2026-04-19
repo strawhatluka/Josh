@@ -11,9 +11,7 @@ describe('readMemories', () => {
   it('returns rows from the default query when no options are provided', async () => {
     pgMock.__setRows([{ id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }]);
     const result = await readMemories();
-    expect(result).toEqual([
-      { id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }
-    ]);
+    expect(result).toEqual([{ id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }]);
     expect(pgMock.sqlMock).toHaveBeenCalledTimes(1);
   });
 

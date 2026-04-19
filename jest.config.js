@@ -22,5 +22,5 @@ module.exports = {
   },
   clearMocks: true,
   resetModules: true,
-  verbose: true
+  verbose: false
 };

@@ -49,9 +49,9 @@ function memoryStorage() {
 
 function multer(_options) {
   return {
-    single: (_fieldName) => middlewareFactory(),
+    single: _fieldName => middlewareFactory(),
     array: (_fieldName, _maxCount) => middlewareFactory(),
-    fields: (_fieldsArr) => middlewareFactory(),
+    fields: _fieldsArr => middlewareFactory(),
     any: () => middlewareFactory(),
     none: () => middlewareFactory()
   };

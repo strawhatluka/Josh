@@ -87,7 +87,8 @@ async function loadMemories(container) {
     displayMemories(data.memories, container);
   } catch (error) {
     console.error('Error loading memories:', error);
-    container.innerHTML = '<div class="message error">Failed to load memories. Please refresh the page.</div>';
+    container.innerHTML =
+      '<div class="message error">Failed to load memories. Please refresh the page.</div>';
   }
 }
 
@@ -98,24 +99,26 @@ async function loadMemories(container) {
  */
 function displayMemories(memories, container) {
   if (!memories || memories.length === 0) {
-    container.innerHTML = '<p class="text-center">No memories shared yet. Be the first to share a memory.</p>';
+    container.innerHTML =
+      '<p class="text-center">No memories shared yet. Be the first to share a memory.</p>';
     return;
   }
 
-  const html = memories.map(memory => {
-    const date = new Date(memory.timestamp).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const html = memories
+    .map(memory => {
+      const date = new Date(memory.timestamp).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
-    const photoHtml = memory.photo
-      ? `<div class="memory-photo"><img src="${memory.photo}" alt="Memory photo" loading="lazy"></div>`
-      : '';
+      const photoHtml = memory.photo
+        ? `<div class="memory-photo"><img src="${memory.photo}" alt="Memory photo" loading="lazy"></div>`
+        : '';
 
-    return `
+      return `
       <div class="memory-card">
         <div class="memory-from">${escapeHtml(memory.from)}</div>
         <div class="memory-message">${escapeHtml(memory.message)}</div>
@@ -123,7 +126,8 @@ function displayMemories(memories, container) {
         <div class="memory-date">${date}</div>
       </div>
     `;
-  }).join('');
+    })
+    .join('');
 
   container.innerHTML = html;
 }
@@ -140,14 +144,14 @@ function escapeHtml(text) {
 }
 
 // Photo file input change handler - show crop modal
-photoInput.addEventListener('change', (e) => {
+photoInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
 
   selectedFile = file;
   const reader = new FileReader();
 
-  reader.onload = (event) => {
+  reader.onload = event => {
     const image = document.getElementById('cropImage');
     image.src = event.target.result;
     cropModal.classList.add('active');
@@ -173,16 +177,20 @@ document.getElementById('cropConfirm').addEventListener('click', () => {
   if (!cropper) return;
 
   const canvas = cropper.getCroppedCanvas();
-  canvas.toBlob((blob) => {
-    croppedBlob = blob;
-    cropModal.classList.remove('active');
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
-    }
-    // Show user feedback that photo is ready
-    showMessage('Photo ready! Fill out your message and click Share Memory.', 'success');
-  }, 'image/jpeg', 0.9);
+  canvas.toBlob(
+    blob => {
+      croppedBlob = blob;
+      cropModal.classList.remove('active');
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+      // Show user feedback that photo is ready
+      showMessage('Photo ready! Fill out your message and click Share Memory.', 'success');
+    },
+    'image/jpeg',
+    0.9
+  );
 });
 
 // Cancel crop
@@ -208,7 +216,7 @@ closeCropModal.addEventListener('click', () => {
 });
 
 // Close modal on outside click
-window.addEventListener('click', (e) => {
+window.addEventListener('click', e => {
   if (e.target === cropModal) {
     cropModal.classList.remove('active');
     if (cropper) {
@@ -221,7 +229,7 @@ window.addEventListener('click', (e) => {
 });
 
 // Form submission handler
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', async e => {
   e.preventDefault();
 
   const formData = new FormData();

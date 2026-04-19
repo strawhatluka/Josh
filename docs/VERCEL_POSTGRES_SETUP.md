@@ -5,11 +5,13 @@ This memorial website now uses **Vercel Postgres** for persistent data storage a
 ## What Changed
 
 ### Before (JSON Files):
+
 - Memories stored in `data/memories.json` ❌ Lost on each deployment
 - Gallery stored in `data/gallery.json` ❌ Lost on each deployment
 - Photos stored in `public/images/` ❌ Lost on each deployment
 
 ### After (Vercel Postgres + Blob):
+
 - Memories stored in PostgreSQL database ✅ Persistent
 - Gallery stored in PostgreSQL database ✅ Persistent
 - Photos stored in Vercel Blob ✅ Persistent
@@ -45,6 +47,7 @@ This memorial website now uses **Vercel Postgres** for persistent data storage a
 Vercel automatically adds these environment variables to your project:
 
 **Postgres Variables:**
+
 - `POSTGRES_URL` - Main connection string
 - `POSTGRES_PRISMA_URL` - Prisma-compatible URL
 - `POSTGRES_URL_NON_POOLING` - Direct connection
@@ -54,9 +57,11 @@ Vercel automatically adds these environment variables to your project:
 - `POSTGRES_DATABASE` - Database name
 
 **Blob Variables:**
+
 - `BLOB_READ_WRITE_TOKEN` - Authentication token for Blob storage
 
 To verify these were added:
+
 1. Go to your project Settings
 2. Click **Environment Variables**
 3. You should see all the above variables listed
@@ -71,6 +76,7 @@ If you haven't already, add these variables in Vercel dashboard (Settings > Envi
 - `NODE_ENV` - Set to `production`
 
 For each variable:
+
 1. Select which environments: Production, Preview, Development (check all three)
 2. Enter the value
 3. Click "Save"
@@ -78,6 +84,7 @@ For each variable:
 ### 4. Deploy Your Code
 
 1. Commit all changes:
+
 ```bash
 git add .
 git commit -m "Migrate to Vercel Postgres and Blob storage"
@@ -111,6 +118,7 @@ After deployment:
 The following tables are automatically created:
 
 ### `memories` table:
+
 ```sql
 CREATE TABLE memories (
   id SERIAL PRIMARY KEY,
@@ -122,6 +130,7 @@ CREATE TABLE memories (
 ```
 
 ### `gallery` table:
+
 ```sql
 CREATE TABLE gallery (
   id SERIAL PRIMARY KEY,
@@ -134,6 +143,7 @@ CREATE TABLE gallery (
 ```
 
 ### `session` table:
+
 ```sql
 CREATE TABLE session (
   sid VARCHAR NOT NULL PRIMARY KEY,
@@ -150,6 +160,7 @@ CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire);
 **Managed by:** `connect-pg-simple` package (PostgreSQL session store for express-session)
 
 **Configuration:**
+
 - Sessions expire after 24 hours
 - Table is automatically created on first server startup
 - Session data includes `isAdmin` flag and username
@@ -161,11 +172,13 @@ CREATE INDEX IF NOT EXISTS IDX_session_expire ON session (expire);
 Since you checked the "Development" environment when creating the Postgres and Blob stores, you can connect your local development server directly to the production database:
 
 1. **Install Vercel CLI** (if not already installed):
+
 ```bash
 npm i -g vercel
 ```
 
 2. **Link your project** (one-time setup):
+
 ```bash
 vercel link
 ```
@@ -173,6 +186,7 @@ vercel link
 Follow the prompts to link to your Vercel project.
 
 3. **Pull ALL environment variables from Vercel**:
+
 ```bash
 vercel env pull .env.local
 ```
@@ -182,6 +196,7 @@ This command downloads ALL environment variables from Vercel (user-configured + 
 **IMPORTANT:** This command OVERWRITES `.env.local` completely, so make sure all your environment variables are stored in Vercel dashboard (Settings > Environment Variables).
 
 The downloaded `.env.local` will include:
+
 - `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SESSION_SECRET`
 - `POSTGRES_URL` and all Postgres connection strings
 - `BLOB_READ_WRITE_TOKEN` for photo storage
@@ -190,11 +205,13 @@ The downloaded `.env.local` will include:
 **After pulling environment variables**, you must change `NODE_ENV` to `development` in `.env.local`:
 
 Open `.env.local` and change:
+
 ```bash
 NODE_ENV="production"
 ```
 
 To:
+
 ```bash
 NODE_ENV="development"
 ```
@@ -202,11 +219,13 @@ NODE_ENV="development"
 **Why?** `NODE_ENV=production` sets `secure: true` on cookies (requires HTTPS). Local development runs on HTTP (`localhost:3000`), so admin login won't work without this change.
 
 4. **Run the development server**:
+
 ```bash
 npm run dev
 ```
 
 Your local server will now connect to:
+
 - Production Postgres database (Neon)
 - Production Blob storage
 - Use your production admin credentials
@@ -219,11 +238,13 @@ If you prefer to keep development data separate:
 
 1. Install PostgreSQL locally
 2. Create a database:
+
 ```bash
 createdb memorial_local
 ```
 
 3. Create `.env.local` with only local Postgres connection:
+
 ```env
 POSTGRES_URL=postgresql://localhost/memorial_local
 ADMIN_USERNAME=admin
@@ -243,6 +264,7 @@ NODE_ENV=development
 **Error:** "Failed to initialize database"
 
 **Solution:**
+
 1. Check that Vercel Postgres is properly connected to your project
 2. Verify environment variables are set in Vercel dashboard
 3. Redeploy the project
@@ -252,6 +274,7 @@ NODE_ENV=development
 **Error:** "Failed to upload file"
 
 **Solution:**
+
 1. Check that Vercel Blob is properly connected
 2. Verify `BLOB_READ_WRITE_TOKEN` environment variable exists
 3. Check Vercel Blob dashboard for storage limits
@@ -259,6 +282,7 @@ NODE_ENV=development
 ### Admin panel 401 errors
 
 **Solution:** This was the original issue - now fixed with proper CORS and session configuration. If it persists:
+
 1. Clear browser cookies
 2. Try logging in again
 3. Check that `SESSION_SECRET` environment variable is set
@@ -268,6 +292,7 @@ NODE_ENV=development
 **Error:** "Unauthorized" errors in admin panel even after logging in
 
 **Solution:**
+
 1. Session store is properly configured with PostgreSQL
 2. Verify `POSTGRES_URL` environment variable is set
 3. Check that session table exists in database
@@ -275,6 +300,7 @@ NODE_ENV=development
 5. Check Vercel function logs for session-related errors
 
 **Technical Details:**
+
 - Sessions are stored in PostgreSQL using `connect-pg-simple`
 - This ensures sessions persist across serverless function instances
 - Without database session storage, each serverless instance has its own memory, causing session loss
@@ -286,6 +312,7 @@ If you had deployed with JSON files and have existing memories/photos:
 **Note:** The JSON data migration functionality was not completed since you're starting fresh. The system will start with empty tables.
 
 If you need to migrate existing data later, you'll need to:
+
 1. Export data from JSON files
 2. Insert into PostgreSQL manually or create a migration script
 
@@ -313,9 +340,11 @@ Your memorial site should easily fit within free tier limits.
 ## Support
 
 For Vercel-specific issues:
+
 - [Vercel Postgres Docs](https://vercel.com/docs/storage/vercel-postgres)
 - [Vercel Blob Docs](https://vercel.com/docs/storage/vercel-blob)
 
 For application issues, check:
+
 - Server logs in Vercel dashboard
 - Browser console for frontend errors

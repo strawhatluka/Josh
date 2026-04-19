@@ -16,29 +16,34 @@ This memorial website is a production-ready, secure, and well-architected full-s
 ### Technology Stack
 
 **Frontend**:
+
 - HTML5 semantic markup
 - CSS3 with mobile-first responsive design
 - Vanilla JavaScript (no framework dependencies)
 - Cropper.js for image manipulation
 
 **Backend**:
+
 - Node.js v18+ runtime
 - Express.js web framework
 - RESTful API design
 - Session-based authentication
 
 **Database & Storage**:
+
 - Vercel Postgres (Neon) - Serverless PostgreSQL
 - Vercel Blob - Serverless blob storage
 - PostgreSQL session store for serverless compatibility
 
 **Security**:
+
 - bcryptjs for password hashing
 - Helmet.js for security headers
 - Express Rate Limit for DoS protection
 - Content Security Policy (CSP)
 
 **Code Quality**:
+
 - ESLint for linting
 - Prettier for formatting
 - Husky for git hooks
@@ -58,6 +63,7 @@ Josh/
 ## Feature Assessment
 
 ### Public Features ✅
+
 - [x] Landing page with obituary
 - [x] Photo gallery with lazy loading
 - [x] Memory submission with photo cropping
@@ -65,6 +71,7 @@ Josh/
 - [x] Fully responsive design (mobile, tablet, desktop)
 
 ### Admin Features ✅
+
 - [x] Secure authentication (bcrypt + sessions)
 - [x] Photo upload with cropping
 - [x] Photo caption editing
@@ -74,6 +81,7 @@ Josh/
 - [x] Rate limiting on login
 
 ### Security Features ✅
+
 - [x] Rate limiting (login & submissions)
 - [x] Content Security Policy
 - [x] Security headers (HSTS, X-Frame-Options, etc.)
@@ -173,7 +181,7 @@ Josh/
 3. **Rate Limiting**:
    - ✅ Admin login: 5 attempts per 15 minutes
    - ✅ Memory submission: 5 per minute
-   - ⚠️  In-memory store (consider Redis for scaling)
+   - ⚠️ In-memory store (consider Redis for scaling)
 
 4. **Security Headers**:
    - ✅ Content-Security-Policy
@@ -237,6 +245,7 @@ Josh/
 ### Production Dependencies (11)
 
 All dependencies are:
+
 - ✅ Actively maintained
 - ✅ Security-vetted
 - ✅ Version-pinned in package-lock.json
@@ -245,6 +254,7 @@ All dependencies are:
 ### Development Dependencies (4)
 
 All dev dependencies are:
+
 - ✅ Latest stable versions
 - ✅ Properly configured
 - ✅ No security concerns
@@ -286,6 +296,7 @@ All dev dependencies are:
 ### Test Coverage Recommendations
 
 For future development, consider:
+
 - Unit tests for utility functions
 - Integration tests for API endpoints
 - E2E tests for critical user flows
@@ -308,6 +319,7 @@ For future development, consider:
 ### Production Readiness: ✅ Ready
 
 The application is production-ready with the following caveats:
+
 1. Change default admin credentials
 2. Set NODE_ENV=production
 3. Configure all environment variables

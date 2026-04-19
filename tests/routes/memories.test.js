@@ -14,7 +14,7 @@ jest.mock('../../src/config/rateLimits', () => ({
 
 const pgMock = require('../_mocks/vercelPostgres');
 const blobMock = require('../_mocks/vercelBlob');
-const multerMock = require('multer');
+const multerMock = require('../_mocks/multer');
 const memoriesRouter = require('../../src/routes/memories');
 
 function buildApp() {
@@ -35,9 +35,7 @@ describe('GET /api/memories', () => {
   });
 
   it('returns memories on success', async () => {
-    pgMock.__setRows([
-      { id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }
-    ]);
+    pgMock.__setRows([{ id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }]);
     const res = await request(app).get('/api/memories');
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -63,12 +61,8 @@ describe('POST /api/memories', () => {
   });
 
   it('creates a memory without a photo', async () => {
-    pgMock.__setRows([
-      { id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }
-    ]);
-    const res = await request(app)
-      .post('/api/memories')
-      .send({ from: 'Luka', message: 'hi' });
+    pgMock.__setRows([{ id: 1, from: 'Luka', message: 'hi', photo: null, timestamp: 't' }]);
+    const res = await request(app).post('/api/memories').send({ from: 'Luka', message: 'hi' });
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.memory.id).toBe(1);
@@ -117,9 +111,7 @@ describe('POST /api/memories', () => {
 
   it('returns 500 when the DB save fails', async () => {
     pgMock.__setError(new Error('insert failed'));
-    const res = await request(app)
-      .post('/api/memories')
-      .send({ from: 'Luka', message: 'hi' });
+    const res = await request(app).post('/api/memories').send({ from: 'Luka', message: 'hi' });
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
   });

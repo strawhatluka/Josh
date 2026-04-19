@@ -70,14 +70,18 @@ async function loadGalleryPhotos() {
  * Displays gallery photos in the DOM
  */
 function displayGalleryPhotos(photos, container) {
-  const html = photos.map(photo => `
+  const html = photos
+    .map(
+      photo => `
     <div class="gallery-item">
       <img data-src="${photo.photo_url}" alt="${photo.caption || 'Photo'}">
       <div class="gallery-caption">
         ${photo.caption || ''}
       </div>
     </div>
-  `).join('');
+  `
+    )
+    .join('');
 
   container.innerHTML = html;
 

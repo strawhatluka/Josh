@@ -25,9 +25,9 @@ describe('uploadFile', () => {
 
   it('wraps put errors with a generic "Failed to upload file"', async () => {
     blobMock.put.mockRejectedValueOnce(new Error('blob 500'));
-    await expect(
-      uploadFile(Buffer.from('x'), 'x.jpg', 'gallery')
-    ).rejects.toThrow('Failed to upload file');
+    await expect(uploadFile(Buffer.from('x'), 'x.jpg', 'gallery')).rejects.toThrow(
+      'Failed to upload file'
+    );
   });
 });
 

@@ -83,7 +83,9 @@ describe('sanitizeText', () => {
   it('returns empty string for non-string input', () => {
     expect(sanitizeText(null)).toBe('');
     expect(sanitizeText(undefined)).toBe('');
+    // @ts-expect-error intentional: verifying runtime non-string handling
     expect(sanitizeText(42)).toBe('');
+    // @ts-expect-error intentional: verifying runtime non-string handling
     expect(sanitizeText({})).toBe('');
   });
 
