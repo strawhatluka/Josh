@@ -91,8 +91,13 @@ router.post('/login', adminLoginLimiter, async (req, res) => {
 
 // Logout endpoint
 router.post('/logout', (req, res) => {
-  req.session.destroy();
-  res.json({ success: true, message: 'Logged out' });
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err);
+      return res.status(500).json({ success: false, message: 'Logout failed' });
+    }
+    res.json({ success: true, message: 'Logged out' });
+  });
 });
 
 // Check auth status
@@ -108,6 +113,7 @@ router.get('/gallery', requireAuth, async (req, res) => {
     const photos = await readGallery();
     res.json({ success: true, photos });
   } catch (error) {
+    console.error('Error loading gallery:', error);
     res.status(500).json({ success: false, message: 'Failed to load gallery' });
   }
 });
@@ -225,6 +231,7 @@ router.get('/memories', requireAuth, async (req, res) => {
     const memories = await readMemories();
     res.json({ success: true, memories });
   } catch (error) {
+    console.error('Error loading memories:', error);
     res.status(500).json({ success: false, message: 'Failed to load memories' });
   }
 });

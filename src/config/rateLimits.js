@@ -1,4 +1,4 @@
-const rateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit').default;
 
 /**
  * Rate limiter for admin login endpoint

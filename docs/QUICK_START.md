@@ -1,5 +1,12 @@
 # Quick Start Guide
 
+## 0. Prerequisites
+
+- Node.js 24+ (`engines.node: ">=24"` in `package.json`)
+- A Vercel account (for Postgres + Blob storage)
+
+Run `npm install` once to pull dependencies and set up the Husky pre-commit hook.
+
 ## 1. Start the Server
 
 ```bash
@@ -11,6 +18,7 @@ The site will be at: http://localhost:3000
 ## 2. Add Your Content
 
 ### Landing Page
+
 1. Add his photo to `public/images/landing/` as `photo.jpg`
 2. Edit `public/index.html` to add:
    - His full name
@@ -18,6 +26,7 @@ The site will be at: http://localhost:3000
    - Your obituary text
 
 ### Photo Gallery
+
 1. Go to http://localhost:3000/admin
 2. Login (username: `admin`, password: `changeme123`)
 3. Click "Photo Gallery" tab
@@ -27,12 +36,16 @@ The site will be at: http://localhost:3000
 7. Click "Crop & Upload"
 
 ### Resources Page
+
 Edit `public/flowers.html`:
+
 - Add context about his passing (if desired)
 - Add your GoFundMe link
 - Describe what the funds will support
 
 ## 3. Test Everything
+
+### Manual smoke test in the browser
 
 - Visit all 4 pages to ensure content looks good
 - Test on mobile (resize browser window)
@@ -41,12 +54,24 @@ Edit `public/flowers.html`:
 - Upload a test photo via admin panel (gallery) - test gallery crop feature
 - Verify you can view and delete memories with photos in admin panel
 
+### Automated test suite
+
+```bash
+npm test               # run the Jest suite (127 tests, DB mocked)
+npm run test:coverage  # with coverage report (80% threshold enforced)
+npm run typecheck      # tsc --noEmit (JS type check via checkJs)
+```
+
+The automated suite uses mocked Vercel Postgres / Blob / multer — no database or network access required.
+
 ## 4. Before Deploying
 
 ### Change Admin Credentials
+
 See [ADMIN.md](ADMIN.md) for detailed instructions.
 
 Quick version:
+
 1. Copy the env file:
    ```bash
    cp .env.example .env
@@ -60,6 +85,7 @@ Quick version:
 3. Restart the server
 
 ### Deploy
+
 See [DEPLOYMENT.md](DEPLOYMENT.md) for step-by-step deployment to free hosting.
 
 Recommended: Vercel (free tier, excellent performance with global CDN)
@@ -76,23 +102,27 @@ Recommended: Vercel (free tier, excellent performance with global CDN)
 Edit `public/css/global.css` - look for `:root` variables at the top
 
 **Add more pages:**
+
 1. Create new HTML file in `public/`
 2. Add link to navigation in all pages
-3. Add route in `src/server.js`
+3. Add route in `src/app.js` (the Express app factory — `src/server.js` is now just the thin bootstrap)
 
 **Moderate memories:**
 Use admin panel at http://localhost:3000/admin - "Memories" tab
+
 - Edit memory names and messages
 - View photos attached to memories
 - Delete inappropriate memories (including photos)
 
 **Manage gallery:**
 Use admin panel - "Photo Gallery" tab
+
 - Crop and upload new photos
 - Edit captions
 - Delete photos
 
 **Backup your data:**
+
 - Data is automatically backed up in Vercel Postgres (Neon)
 - Photos are stored in Vercel Blob with high redundancy
 - Export data from Vercel Storage dashboard if needed:

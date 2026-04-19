@@ -1,15 +1,24 @@
 # Initial Setup Guide
 
+## Step 0: Prerequisites
+
+- Node.js 24+ (the project declares `engines.node: ">=24"`; CI also runs Node 24)
+- A Vercel account for Postgres + Blob storage (see [`VERCEL_POSTGRES_SETUP.md`](VERCEL_POSTGRES_SETUP.md))
+
+Run `npm install` once to pull dependencies. This also sets up the Husky pre-commit hook automatically.
+
 ## Step 1: Configure Admin Credentials
 
 **IMPORTANT: Do this before deploying!**
 
 1. Copy the environment template:
+
    ```bash
    cp .env.example .env
    ```
 
 2. Open `.env` in your text editor and change these values:
+
    ```env
    ADMIN_USERNAME=your_chosen_username
    ADMIN_PASSWORD=YourSecurePassword123!
@@ -20,6 +29,7 @@
    - Use a "Fort Knox Password" or similar long random string
 
 **Security Notes:**
+
 - Don't use simple passwords
 - Never commit the `.env` file to Git (it's already in `.gitignore`)
 - The password is automatically hashed by the application
@@ -33,6 +43,7 @@ npm run dev
 The site will run at: http://localhost:3000
 
 You should see a warning if using default credentials:
+
 ```
 ⚠️  WARNING: Using default admin credentials!
    Create a .env file from .env.example and set secure credentials.
@@ -49,12 +60,14 @@ If you created the `.env` file correctly, you won't see this warning.
 ## Step 4: Add Your Content
 
 ### Landing Page
+
 1. Add his photo to `public/images/landing/photo.jpg`
 2. Edit `public/index.html`:
    - Replace `[Full Name]`
    - Add dates and obituary text
 
 ### Photo Gallery (via Admin Panel)
+
 1. Log into admin panel
 2. Go to "Photo Gallery" tab
 3. Select a photo file
@@ -64,12 +77,16 @@ If you created the `.env` file correctly, you won't see this warning.
 7. Gallery loads dynamically from PostgreSQL database
 
 ### Resources Page
+
 Edit `public/flowers.html`:
+
 - Add GoFundMe link (replace `[YOUR_GOFUNDME_LINK]`)
 - Add any context about his passing
 - Customize resource descriptions if needed
 
 ## Step 5: Test Everything
+
+### Manual checks in the browser
 
 - [ ] Visit all 4 public pages
 - [ ] Test responsive design (resize browser)
@@ -78,11 +95,22 @@ Edit `public/flowers.html`:
 - [ ] Edit/delete test content via admin
 - [ ] Check that photos appear on gallery page
 
+### Automated suite
+
+```bash
+npm run lint           # ESLint
+npm run typecheck      # tsc --noEmit (JS type check)
+npm run test:coverage  # Jest + coverage (80% threshold)
+```
+
+The Jest suite (127 tests) mocks Vercel Postgres / Blob / multer, so it runs offline without needing your real database credentials.
+
 ## Ready to Deploy?
 
 See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying to free hosting.
 
 **Before deploying, make sure:**
+
 - [ ] `.env` file has secure credentials
 - [ ] Landing page has real content
 - [ ] You've tested all functionality locally
@@ -90,7 +118,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for instructions on deploying to free hosting
 
 ## Environment Variables for Deployment
 
-When deploying to hosting platforms (Render, Railway, etc.), you'll need to set these environment variables in their dashboard:
+This project is designed for Vercel (see [`DEPLOYMENT.md`](DEPLOYMENT.md)). Set these environment variables in the Vercel dashboard under **Settings → Environment Variables**:
 
 ```
 ADMIN_USERNAME=your_username
@@ -104,16 +132,19 @@ NODE_ENV=production
 ## Troubleshooting
 
 **Can't log into admin:**
+
 - Check your `.env` file exists and has correct values
 - Restart the server after changing `.env`
 - Try the default credentials (admin/changeme123) if `.env` isn't loading
 
 **Warning about default credentials:**
+
 - This means `.env` file wasn't found or didn't load
 - Make sure you copied `.env.example` to `.env`
 - Check that `.env` is in the root directory
 
 **Photos not appearing:**
+
 - Check admin panel uploaded them successfully (look for success message)
 - Verify photos were uploaded to Vercel Blob (check Vercel Storage dashboard)
 - Check database contains photo entries (check Vercel Storage → Postgres → Data)

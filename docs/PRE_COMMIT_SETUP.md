@@ -20,7 +20,7 @@ This project uses pre-commit hooks to ensure code quality before commits.
 ## Available Scripts
 
 ```bash
-# Format all files
+# Format all files (JS, JSON, CSS, HTML, Markdown)
 npm run format
 
 # Check formatting without making changes
@@ -31,6 +31,15 @@ npm run lint
 
 # Run linter and auto-fix issues
 npm run lint:fix
+
+# Typecheck the JS codebase (tsc --noEmit with checkJs)
+npm run typecheck
+
+# Run the Jest test suite
+npm test
+
+# Run tests with coverage report (enforces 80% threshold)
+npm run test:coverage
 ```
 
 ## How It Works
@@ -38,9 +47,11 @@ npm run lint:fix
 When you run `git commit`, the pre-commit hook automatically:
 
 1. Runs ESLint on staged `.js` files and fixes auto-fixable issues
-2. Runs Prettier on staged files (JS, JSON, CSS, HTML) and formats them
+2. Runs Prettier on staged files (JS, JSON, CSS, HTML, MD) and formats them
 3. Stages the formatted/fixed files
 4. Proceeds with the commit if all checks pass
+
+> **Note:** the pre-commit hook does NOT run `test` or `typecheck` — those are enforced by CI instead (see `.github/workflows/ci.yml`). Keeping the hook fast avoids slowing down every commit.
 
 ## Testing the Pre-Commit Hook
 
@@ -54,13 +65,13 @@ git add .
 npx lint-staged
 ```
 
-## Current Linting Warnings
+## Linting Rules of Note
 
-The linter currently shows warnings for:
-- Unused variables in catch blocks (can be prefixed with `_` to ignore)
-- Functions defined in HTML onclick attributes (editPhoto, deletePhoto, editMemory, deleteMemory)
+A few specific conventions baked into `eslint.config.js`:
 
-These are warnings only and won't block commits.
+- Unused catch-clause bindings and unused function args are permitted when prefixed with `_` (`caughtErrorsIgnorePattern` + `argsIgnorePattern: '^_'`).
+- Functions called from inline `onclick=` handlers in HTML (e.g. `editPhoto`, `deletePhoto`, `editMemory`, `deleteMemory`) are explicitly attached to `window` in `public/js/admin.js` so ESLint sees their usage.
+- Test files (`tests/**/*.js`, `**/*.test.js`) get a dedicated config block that injects Jest globals (`describe`, `it`, `expect`, `beforeEach`, etc.).
 
 ## Bypassing Pre-Commit Hooks
 
