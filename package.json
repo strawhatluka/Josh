@@ -1,6 +1,6 @@
 {
   "name": "memorial-website",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A memorial website to honor and remember",
   "main": "src/server.js",
   "engines": {
