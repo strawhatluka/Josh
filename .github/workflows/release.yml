@@ -1,0 +1,84 @@
+# =============================================================================
+# Memorial Website - Release Drafting
+# =============================================================================
+# Triggered on push of a v*.*.* tag. Extracts the matching section from
+# CHANGELOG.md and creates a DRAFT GitHub release. User reviews and publishes
+# the draft manually from the GitHub UI, which in turn fires deploy.yml.
+#
+# Pattern mirrors strawhatluka/bwaincell.
+# =============================================================================
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+      version_without_v: ${{ steps.get_version.outputs.version_without_v }}
+    steps:
+      - name: Get version from tag
+        id: get_version
+        run: |
+          echo "version=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+          echo "version_without_v=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+  release-notes:
+    name: Extract Release Notes
+    runs-on: ubuntu-latest
+    outputs:
+      notes: ${{ steps.extract.outputs.notes }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract release notes from CHANGELOG
+        id: extract
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if ! grep -q "## \[$VERSION\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md does not contain a section for version $VERSION"
+            exit 1
+          fi
+          NOTES=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' | tail -n +2)
+          if [ -z "$NOTES" ]; then
+            echo "::error::Version $VERSION section in CHANGELOG.md is empty"
+            exit 1
+          fi
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "notes<<$EOF" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
+  release:
+    name: Create Draft Release
+    needs: [version, release-notes]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Memorial Website ${{ needs.version.outputs.version }}
+          tag_name: ${{ needs.version.outputs.version }}
+          body: |
+            ${{ needs.release-notes.outputs.notes }}
+
+            ---
+
+            **Full Changelog**: https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md
+          draft: true
+          prerelease: false
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

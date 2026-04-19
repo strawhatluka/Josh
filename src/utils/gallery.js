@@ -59,7 +59,7 @@ async function addPhoto(photo) {
 
 /**
  * Updates a photo's caption
- * @param {number} id - Photo ID
+ * @param {string|number} id - Photo ID
  * @param {Object} updates - { caption }
  * @returns {Promise<Object>}
  */

@@ -20,14 +20,17 @@ try {
 // IMPORTANT: Create a .env file from .env.example and change these values!
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 
+// Bcrypt rounds: reduced in test env to keep suite fast; production strength otherwise.
+const BCRYPT_ROUNDS = process.env.NODE_ENV === 'test' ? 4 : 12;
+
 // If ADMIN_PASSWORD is provided (plaintext), hash it
 // Otherwise use the pre-hashed value or default
 let ADMIN_PASSWORD_HASH;
 if (process.env.ADMIN_PASSWORD) {
-  ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD, 10);
+  ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD, BCRYPT_ROUNDS);
 } else {
   // Default password hash for 'changeme123'
-  ADMIN_PASSWORD_HASH = bcrypt.hashSync('changeme123', 10);
+  ADMIN_PASSWORD_HASH = bcrypt.hashSync('changeme123', BCRYPT_ROUNDS);
 }
 
 // Session secret from environment or default
